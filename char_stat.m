@@ -16,3 +16,7 @@ for k=1:length(u)
 end
 
 plot(u, y);
+xlabel("u")
+ylabel("y")
+title("Charakterystyka statyczna")
+exportgraphics(gca, "char_stat.pdf")
