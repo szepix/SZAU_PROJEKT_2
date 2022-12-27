@@ -2,7 +2,7 @@ close all
 clear
 clc
 
-parameters = [3 4 2 20 200 1e-05 2 2];
+parameters = [3 4 2 9 200 1e-05 2 1];
 
 w10c = cell(10, 5);
 w20c = cell(10, 5);
@@ -11,15 +11,15 @@ w2c = cell(10, 5);
 E_ucz = zeros(10, 5);
 E_wer = zeros(10, 5);
 
-for numberOfNeurons = 1:10
-	parameters(4) = numberOfNeurons;
+% for numberOfNeurons = 1:10
+% 	parameters(4) = numberOfNeurons;
 	writematrix(parameters, 'ustawienia.txt', 'Delimiter', 'space')
 	for iteration = 1:10
-		numberOfNeurons
+		numberOfNeurons = 9
 		iteration
 		system('sieci.exe');
-		system("copy uczenie.m sieci_output\uczenie_" + num2str(numberOfNeurons) + "_" + num2str(iteration) + ".m");
-		system("copy model.m sieci_output\model_" + num2str(numberOfNeurons) + "_" + num2str(iteration) + ".m");
+		system("copy uczenie.m sieci_output\uczenie_ARX_9neur_" + num2str(iteration) + ".m");
+		system("copy model.m sieci_output\model_ARX_9neur_" + num2str(iteration) + ".m");
 		
 		model
 		w10c{numberOfNeurons, iteration} = w10;
@@ -31,6 +31,6 @@ for numberOfNeurons = 1:10
 		E_ucz(numberOfNeurons, iteration) = e_ucz;
 		E_wer(numberOfNeurons, iteration) = e_wer;
 	end
-end
+% end
 
-save("liczba_neuronow_wyniki.mat", "E_ucz", "E_wer", "w10c", "w20c", "w1c", "w2c");
+save("ARX_9NEUR_WYNIKI.mat", "E_ucz", "E_wer", "w10c", "w20c", "w1c", "w2c");
