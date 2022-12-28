@@ -80,3 +80,6 @@ exportgraphics(gca, "relacja_modelu_mnk_weryfikujace.pdf")
     
  end
  BladWeryfikacji
+
+
+ 
