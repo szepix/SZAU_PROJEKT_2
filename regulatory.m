@@ -13,10 +13,10 @@ nb = 4;
 
 %czas trwania symulacji
 kk = 800;
+regulator = "NPL";
 
-
-N = 25;
-Nu = 25;
+N = 35;
+Nu = 35;
 lambda = 10;
 
 %inicjalizacja
@@ -44,6 +44,12 @@ yzad(200:420) = -0.1;
 yzad(420:kk) = 0.5;
 % global w10 w1 w20 w2
 model_10_1            %wczytanie modelu
+% values = load("model_toolbox_levenberg.mat");
+% w20 = values.b(end);
+% w10 = values.b(1:end-1);
+% 
+% w2 = values.LW;
+% w1 = values.IW;
 % w10(1,1)=-3.3459926160e-001; w1(1,1)=6.0302399616e-001; w1(1,2)=1.4178682366e+000; w1(1,3)=-7.5660773069e-001; w1(1,4)=-1.2320122000e-001; 
 % w10(2,1)=5.9540037438e-001; w1(2,1)=1.1103794899e-001; w1(2,2)=9.5951463080e-002; w1(2,3)=-8.6801486169e-001; w1(2,4)=5.1105664899e-001; 
 % w10(3,1)=1.0143793353e+000; w1(3,1)=-2.6300431343e-003; w1(3,2)=6.7491613301e-002; w1(3,3)=2.0049480454e-001; w1(3,4)=2.2188246802e-001; 
@@ -58,8 +64,30 @@ model_10_1            %wczytanie modelu
 
 
 
-delta = 10^(-4);    
-
+delta = 10^(-5);    
+b = [0  0  0.0315 0.0518];
+a = [1.3862 -0.4339];
+M=zeros(N,Nu);
+for i = 1:N
+    suma_a = 0;
+    suma_b = 0;
+    iter = min([i,nb]);
+    for j=1:iter
+        suma_b = b(j) + suma_b;
+    end
+    iter = min([i-1,na]);
+    for j=1:iter
+        suma_a = a(j)*s(i-j) + suma_a;
+    end
+    s(i) = suma_b - suma_a;
+end
+for i=1:N
+   for j=1:Nu
+      if (i>=j)
+         M(i,j)=s(i-j+1);
+      end
+   end
+end
 
 for k=5:kk
     for n=1:N
@@ -74,11 +102,18 @@ for k=5:kk
     x1(k) = -alfa1*x1(k-1)+x2(k-1)+beta1*g1(u(k-3));
     x2(k) = -alfa2*x1(k-1)+beta2*g1(u(k-3));
     y(k)  = g2(x1(k));
+    if regulator == "GPC"
+        ymod = b(3)*u(k-3) + b(4)*u(k-4) + a(1)*y(k-1) + a(2)*y(k-2);
+    end
 
+    if regulator == "NPL"
     x = [u(k-3);u(k-4);y(k-1);y(k-2)];
     ymod = w2*tanh(w1*x+w10)+w20;
-    d = y(k) - ymod;
+    end
 
+    d = y(k) - ymod;
+    
+    if regulator == "NPL"
     x = [u(k-2);u(k-3);y(k);y(k-1)];
     y0(1) = w2*tanh(w1*x+w10)+w20 +d;
 
@@ -124,6 +159,7 @@ for k=5:kk
         end
         s(i) = suma_b - suma_a;
     end
+    
     M=zeros(N,Nu);
     for i=1:N
        for j=1:Nu
@@ -132,7 +168,14 @@ for k=5:kk
           end
        end
     end
-
+    end
+    if regulator == "GPC"
+         y0(1) = b(3)*u(k-2) + b(4)*u(k-3) + a(1)*y(k) + a(2)*y(k-1) + d;
+         y0(2) = b(3)*u(k-1) + b(4)*u(k-2) + a(1)*y0(1) + a(2)*y(k) + d;
+        for i=4:N
+            y0(i) = b(3)*u(k-1) + b(4)*u(k-1) + a(1)*y0(i-1) + a(2)*y0(i-2) + d;
+        end
+    end
     K = ((M'*M + lambda * eye(Nu))^(-1))* M';
     Du = K*(Yzad - y0');
     u(k) = Du(1) + u(k-1);
@@ -156,7 +199,7 @@ str2 = sprintf('N=%d  Nu=%d  lambda=%d', N, Nu, lambda);
 %     str2 = sprintf('N=%d  Nu=%d  lambda=%d', N, Nu, lambda);
 %     filename = sprintf('%s__N=%d__Nu=%d__l=%d', algorytm, N, Nu, lambda);
 % end
-%%%%%%%%prezentacja wynik�w symulacji%%%%%%%%
+%%%%%%%%prezentacja wynikow symulacji%%%%%%%%
 figure; 
 subplot(2,1,1);
 stairs(y); hold on;
