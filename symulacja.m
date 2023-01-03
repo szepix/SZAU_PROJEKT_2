@@ -1,17 +1,20 @@
 clear all;
 close all;
-% w10(1,1)=-2.0703111369e-001; w1(1,1)=2.4534613513e-001; w1(1,2)=-1.5012731067e-001; w1(1,3)=-4.2901648542e-001; w1(1,4)=-5.0048073703e-001; 
-% w10(2,1)=1.0766184724e-001; w1(2,1)=-9.4080141814e-001; w1(2,2)=-6.6127260767e-001; w1(2,3)=2.2430431552e-001; w1(2,4)=-1.3674659858e-001; 
-% w10(3,1)=-3.7794943386e-001; w1(3,1)=-2.0616308407e-002; w1(3,2)=-1.8863967722e-001; w1(3,3)=-3.2990734574e-001; w1(3,4)=-1.2935292490e-001; 
-% w10(4,1)=7.9634643159e-001; w1(4,1)=-2.9941000014e-002; w1(4,2)=-1.0859102245e-001; w1(4,3)=-7.2365296831e-001; w1(4,4)=1.9416460588e-001; 
-% w10(5,1)=-8.9103376347e-002; w1(5,1)=-5.1285535048e-001; w1(5,2)=-3.9475657827e-001; w1(5,3)=6.2126785423e-002; w1(5,4)=8.6311187923e-002; 
-% w10(6,1)=3.1010694257e-001; w1(6,1)=-3.4995083426e-002; w1(6,2)=-7.4992253887e-002; w1(6,3)=4.8618657530e-001; w1(6,4)=-1.9117942182e-001; 
-% w10(7,1)=3.0881343104e-001; w1(7,1)=-3.4515668371e-002; w1(7,2)=7.0711847914e-002; w1(7,3)=5.3179084074e-001; w1(7,4)=-2.0831471149e-001; 
-% w10(8,1)=5.1153922213e-001; w1(8,1)=4.5326331024e-001; w1(8,2)=5.5730865651e-001; w1(8,3)=1.9810073373e-001; w1(8,4)=8.1017061060e-002; 
-% w10(9,1)=7.7231465273e-002; w1(9,1)=-9.0694765315e-002; w1(9,2)=-2.6360236238e-001; w1(9,3)=4.6957465001e-001; w1(9,4)=-1.7835842139e-001; 
-% w20=-9.5465257820e-002; w2(1)=1.1082193536e-001; w2(2)=1.1931892400e-001; w2(3)=-7.6544352230e-001; w2(4)=-8.6103658185e-001; w2(5)=-3.6836682488e-001; w2(6)=6.9497404571e-001; w2(7)=5.8437398857e-001; w2(8)=-1.5820101055e-001; w2(9)=7.3850507072e-001; 
-%w10 = 9x1 w20 = 1x1 w2 = 1x9 w1 = 9x4
-values = load("model_toolbox.mat");
+% w10(1,1)=-3.1831115022e-003; w1(1,1)=5.2291962209e-003; w1(1,2)=-1.4244422471e-002; w1(1,3)=1.6896823771e-001; w1(1,4)=1.8709170608e-001; 
+% w10(2,1)=-4.2381264790e-001; w1(2,1)=3.2632157240e-002; w1(2,2)=2.1629090167e-001; w1(2,3)=3.9366067485e-001; w1(2,4)=4.0456545955e-002; 
+% w10(3,1)=-1.6168204808e-002; w1(3,1)=4.8995860100e-002; w1(3,2)=1.0436267497e-001; w1(3,3)=3.0644456226e-001; w1(3,4)=4.1497954731e-001; 
+% w10(4,1)=-4.4781519908e-001; w1(4,1)=-2.8476945483e-002; w1(4,2)=-1.6257054093e-001; w1(4,3)=-5.7177596651e-001; w1(4,4)=3.1248618260e-001; 
+% w10(5,1)=-9.0245806472e-002; w1(5,1)=2.1562714448e-001; w1(5,2)=3.0672852957e-001; w1(5,3)=5.1548246549e-001; w1(5,4)=3.2852774822e-001; 
+% w10(6,1)=-5.0497556426e-001; w1(6,1)=-4.6321698592e-002; w1(6,2)=-1.9661878624e-001; w1(6,3)=5.5530329039e-001; w1(6,4)=-2.5027786866e-001; 
+% w10(7,1)=-2.5155284967e-001; w1(7,1)=3.6151028227e-003; w1(7,2)=9.1483282077e-002; w1(7,3)=-1.9221990750e-001; w1(7,4)=-1.2701636674e-001; 
+% w10(8,1)=1.2500912218e-001; w1(8,1)=-1.1844385215e+000; w1(8,2)=-4.0666990538e-001; w1(8,3)=-1.1499389270e-001; w1(8,4)=1.6724159717e-001; 
+% w10(9,1)=4.5965872106e-001; w1(9,1)=-6.3820960981e-001; w1(9,2)=-4.3976008211e-001; w1(9,3)=-2.4726624260e-001; w1(9,4)=-3.5147521298e-001; 
+% w10(10,1)=1.4621967641e-001; w1(10,1)=1.5471799321e-003; w1(10,2)=3.0711606136e-003; w1(10,3)=3.1480804312e-001; w1(10,4)=-7.1794468618e-002; 
+% w20=-7.7757547110e-002; w2(1)=1.6447536959e-001; w2(2)=6.4282820226e-001; w2(3)=-3.5945510289e-001; w2(4)=-8.6205069640e-001; w2(5)=1.1911357875e-001; w2(6)=8.6492689904e-001; w2(7)=-6.7941582573e-001; w2(8)=-7.1168975761e-002; w2(9)=1.0891019985e-001; w2(10)=1.2118790291e+000; 
+
+
+nazwa = "toolbox_na_oe"
+values = load("model_toolbox_levenberg.mat");
 w20 = values.b(end);
 w10 = values.b(1:end-1);
 
@@ -27,7 +30,7 @@ x_ucz = values.u;
 y = zeros(1, length(y_wer));
 
 arx = 0;
-oe = 1;
+oe = 0;
 if oe
 for k = 5:length(y_wer)
     x = [x_wer(k-3);x_wer(k-4);y(k-1);y(k-2)];
@@ -38,11 +41,11 @@ title("Dane weryfikujace OE")
 hold on
 plot(y_wer)
 hold off
-% exportgraphics(gca, "dane_weryfikujace_arx_na_oe_symulacja.pdf")
+exportgraphics(gca, "dane_weryfikujace_" + nazwa + "_symulacja.pdf")
 figure 
 plot(y, y_wer, '.')
-% exportgraphics(gca, "relacja_modelu_arx_na_oe_weryfikujace.pdf")
 title("Relacja wyjscia modelu z danymi uczacymi")
+exportgraphics(gca, "relacja_modelu_" + nazwa +  "_weryfikujace.pdf")
 error_wer = norm(y_wer - y)^2
 
 figure
@@ -56,12 +59,12 @@ hold on
 plot(y_ucz)
 error_ucz = norm(y_ucz - y)^2
 hold off
-% exportgraphics(gca, "dane_uczace_arx_na_oe_symulacja.pdf")
+exportgraphics(gca, "dane_uczace_" + nazwa + ".pdf")
 figure
 
 plot(y, y_ucz, '.')
 title("Relacja wyjscia modelu z danymi uczacymi")
-% exportgraphics(gca, "relacja_modelu_arx_na_oe_uczace.pdf")
+exportgraphics(gca, "relacja_modelu_" + nazwa +"_uczace.pdf")
 
 end
 if arx
@@ -72,10 +75,15 @@ for k = 5:length(y_wer)
 end
 figure
 plot(y)
-title("Dane weryfikujace OE")
+title("Dane weryfikujace ARX")
 hold on
 plot(y_wer)
 hold off
+exportgraphics(gca, "dane_weryfikujace_" + nazwa + "_symulacja.pdf")
+figure 
+plot(y, y_wer, '.')
+title("Relacja wyjscia modelu z danymi uczacymi")
+exportgraphics(gca, "relacja_modelu_" + nazwa +  "_weryfikujace.pdf")
 error_wer = norm(y_wer - y)^2
 
 figure
@@ -84,9 +92,16 @@ for k = 5:length(y_ucz)
     y(k) = w2*tanh(w1*x+w10)+w20;
 end
 plot(y)
-title("Dane uczace OE")
+title("Dane uczace ARX")
 hold on
 plot(y_ucz)
-error_ucz = norm(y_ucz - y)^2
 hold off
+exportgraphics(gca, "dane_uczace_" + nazwa + ".pdf")
+figure
+
+plot(y, y_ucz, '.')
+title("Relacja wyjscia modelu z danymi uczacymi")
+exportgraphics(gca, "relacja_modelu_" + nazwa +"_uczace.pdf")
+error_ucz = norm(y_ucz - y)^2
+
 end

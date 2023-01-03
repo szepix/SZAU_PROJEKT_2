@@ -35,7 +35,7 @@ sn = configure(sn,u);
 sn.performFcn ='sse';
 sn.trainParam.show = 10;
 sn.trainParam.showCommandLine = 1;
-sn.trainParam.epochs = 200;
+sn.trainParam.epochs = 300;
 sn.trainParam.goal = 0.0001;
 sn.trainParam.showWindow = 0;
 

@@ -1,0 +1,164 @@
+clear all
+
+%parametry obiektu
+alfa1 = -1.422574;
+alfa2 = 0.466776;
+beta1 = 0.017421;
+beta2 = 0.013521;
+g1 = @(u)((exp(4.125*u)-1)/(exp(4.125*u)+1));
+g2 = @(x) (1 - exp(-1.2*x));
+%rzad
+na = 2;
+nb = 4;
+
+%czas trwania symulacji
+kk = 800;
+
+
+N = 15;
+Nu = 5;
+lambda = 1;
+
+%inicjalizacja
+u = zeros(1,kk);        %sterowanie
+y = zeros(1,kk);        %wyjscie obiektu
+ymod     = zeros(1,kk); %wyjscie modelu
+ymod_lin = zeros(1,kk); %wyjscie modelu zlinearyzowanego
+y_zero   = zeros(N,1);  %trajektoria swobodna
+x1 = zeros(1,kk);       %x1
+x2 = zeros(1,kk);       %x2
+s  = zeros(1,N);        %odpowiedz skokowa
+I  = eye(Nu);
+
+%ograniczenia
+u_min = -1;
+u_max = 1;
+umin_opt = u_min*ones(Nu,1);
+umax_opt = u_max*ones(Nu,1);
+
+%wartosc zadana
+global yzad;
+yzad(1:round(kk/10)) = 0;
+yzad(round(kk/6):round(2*kk/6)) = 1.3;
+yzad(round(2*kk/6):round(3*kk/6)) = 2.2;
+yzad(round(3*kk/6):round(4*kk/6)) = 0.7;
+yzad(round(4*kk/6):round(5*kk/6)) = -0.1;
+yzad(round(5*kk/6):round(6*kk/6)) =-0.3;
+% Yzad=yzad.*ones(N,1);
+
+% global w10 w1 w20 w2
+% model_9_7            %wczytanie modelu
+w10(1,1)=5.0431315767e-001; w1(1,1)=3.6298222871e-001; w1(1,2)=-4.8935966725e-001; w1(1,3)=-2.8065310814e-001; w1(1,4)=7.5424279677e-001; 
+w10(2,1)=-2.7670675679e-001; w1(2,1)=5.6813367302e-001; w1(2,2)=5.5222536959e-001; w1(2,3)=6.3592299910e-001; w1(2,4)=-2.2714586488e-001; 
+w10(3,1)=7.4651915568e-001; w1(3,1)=-1.7972589693e-001; w1(3,2)=2.1264197814e-001; w1(3,3)=-4.3089248234e-001; w1(3,4)=-2.8381689053e-001; 
+w10(4,1)=-1.0140761152e-001; w1(4,1)=-1.8163572807e-001; w1(4,2)=5.6347684631e-001; w1(4,3)=1.0742663233e+000; w1(4,4)=-1.1473578364e+000; 
+w10(5,1)=3.5902570911e-001; w1(5,1)=-8.6373787535e-002; w1(5,2)=-2.0734957749e+000; w1(5,3)=-4.2996219705e-001; w1(5,4)=7.4174228920e-001; 
+w10(6,1)=-7.7273595204e-001; w1(6,1)=1.0860096769e-001; w1(6,2)=-1.7551041063e-001; w1(6,3)=-3.7619781068e-001; w1(6,4)=-1.1281320075e-001; 
+w10(7,1)=6.2307312407e-001; w1(7,1)=1.0403821770e-001; w1(7,2)=-3.3660626613e-001; w1(7,3)=2.7720732248e-001; w1(7,4)=9.1397999460e-002; 
+w10(8,1)=-1.2781762076e-003; w1(8,1)=9.5091749398e-001; w1(8,2)=1.2269139248e-001; w1(8,3)=-2.7731461810e-001; w1(8,4)=5.0119985735e-001; 
+w10(9,1)=-1.1505166647e-001; w1(9,1)=-9.5076826111e-003; w1(9,2)=-1.4810302057e-001; w1(9,3)=2.1848345113e-001; w1(9,4)=3.2627414476e-002; 
+w20=-4.7513592659e-001; w2(1)=2.6839588402e-001; w2(2)=1.0221839506e-001; w2(3)=-7.9010148561e-001; w2(4)=6.9672197581e-001; w2(5)=2.7225063964e-002; w2(6)=-7.2871278801e-001; w2(7)=9.3457485587e-001; w2(8)=-1.5013330120e-001; w2(9)=4.4365875929e-001; 
+
+
+delta = 10^(-2);    %delta do linearyzacji modelu
+
+
+%%%%%%%%%%%%%%%%-------------- PETLA REGULACJI --------------%%%%%%%%%%%%%%%%
+for k=5:kk
+    %%%---pomiar wyjscia obiektu---%%%
+    x1(k) = -alfa1*x1(k-1)+x2(k-1)+beta1*g1(u(k-3));
+    x2(k) = -alfa2*x1(k-1)+beta2*g1(u(k-3));
+    y(k)  = g2(x1(k));
+
+    x = [u(k-3);u(k-4);y(k-1);y(k-2)];
+    ymod(k) = w2*tanh(w1*x+w10)+w20;
+    d = y(k) - ymod(k);
+
+
+    x = [u(k-2);u(k-3);y(k);y(k-1)];
+    y0(1) = w2*tanh(w1*x+w10)+w20 +d;
+    x = [u(k-1);u(k-2);y0(1);y(k)]; 
+    y0(2) = w2*tanh(w1*x+w10)+w20 +d;
+    for i=3:N 
+        x = [u(k-1);u(k-1);y0(i-1);y0(i-2)];
+        y0(i) = w2*tanh(w1*x+w10)+w20 +d;
+    end
+    
+    x = [u(k-3)+delta;u(k-4);y(k-1);y(k-2)];
+    ylin = w2*tanh(w1*x+w10)+w20 +d;
+    b3 = (ylin-ymod(k))/delta ;
+
+    x = [u(k-3);u(k-4)+delta;y(k-1);y(k-2)];
+    ylin = w2*tanh(w1*x+w10)+w20 +d;
+    b4 =(ylin - ymod(k))/delta;
+
+    x = [u(k-3);u(k-4);y(k-1)+delta;y(k-2)];
+    ylin = w2*tanh(w1*x+w10)+w20 +d;
+    a1 = -(ylin -ymod(k))/delta;
+
+    x = [u(k-3);u(k-4);y(k-1);y(k-2)+delta];
+    ylin = w2*tanh(w1*x+w10)+w20 +d;
+    a2 = -(ylin-ymod(k))/delta;
+    b = [0 0 b3 b4];
+    a = [a1 a2];
+
+    for i = 1:N
+        suma_a = 0;
+        suma_b = 0;
+        iter = min([i,nb]);
+        for j=1:iter
+            suma_b = b(j) + suma_b;
+        end
+        iter = min([i-1,na]);
+        for j=1:iter
+            suma_a = a(j)*s(i-j) + suma_a;
+        end
+        s(i) = suma_b - suma_a;
+    end
+    M=zeros(N,Nu);
+    for i=1:N
+       for j=1:Nu
+          if (i>=j)
+             M(i,j)=s(i-j+1);
+          end
+       end
+    end
+    for n=1:N
+    %yzad dla horyzontu predykcji
+        if(k+n > kk)
+            Yzad(n,1) = yzad(n);
+        
+    else
+        Yzad(n,1) = yzad(k+n);
+        end
+    end
+    K = ((M'*M + lambda * eye(Nu))^(-1))* M';
+    Du = K*(Yzad - y0');
+    u(k) = Du(1) + u(k-1);
+end
+
+y=y(1:kk);
+E = (yzad(:)-y(:))'*(yzad(:)-y(:));
+str = sprintf('Algorytm %s    E=%e', "NPL", E);
+str2 = sprintf('N=%d  Nu=%d  lambda=%d', N, Nu, lambda);
+% if strcmp(algorytm, 'PID')
+%     str2 = sprintf('K=%.2f  Ti=%d  Td=%.2f', K, Ti, Td);
+%     filename = sprintf('%s__K=%.2f__Ti=%d__Td=%.2f', algorytm, K, Ti, Td);
+%     filename = strrep(filename,'.',',');
+% else
+%     str2 = sprintf('N=%d  Nu=%d  lambda=%d', N, Nu, lambda);
+%     filename = sprintf('%s__N=%d__Nu=%d__l=%d', algorytm, N, Nu, lambda);
+% end
+%%%%%%%%prezentacja wynik�w symulacji%%%%%%%%
+figure; 
+subplot(2,1,1);
+stairs(y); hold on;
+stairs(yzad,':'); xlim([0, kk-N]); ylim([-0.5, 2.4]);
+title({'Wyjscie regulatora',str, str2}); xlabel('k'); ylabel('wartosc sygnalu');
+legend('wyjscie y(k)','wartosc zadana');
+
+subplot(2,1,2); 
+stairs(u);hold on
+title({'Sygnal sterowania'}); xlabel('k'); ylabel('wartosc sygnalu'); xlim([0, kk-N]);
+
+% print(filename,'-dpng','-r400');

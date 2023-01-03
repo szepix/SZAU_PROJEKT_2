@@ -40,7 +40,7 @@ figure(1);
  plot(yp);
 
  legend("dane uczace","dane z modelu");
-%  exportgraphics(gca, "MNK_uczace.pdf")
+ exportgraphics(gca, "MNK_uczace.pdf")
  hold off
  figure
  plot(yp, Yucz, '.')
@@ -67,7 +67,7 @@ figure(2);
   buf='Z2B_wer_Stopien=';
 %  buf=[buf mat2str(Stopien) ' wer'];
 %  print(buf,'-dpng','-r500');
-%  exportgraphics(gca, "MNK_weryfikujace.pdf")
+ exportgraphics(gca, "MNK_weryfikujace.pdf")
  hold off
   figure
  plot(yp, Ywer, '.')

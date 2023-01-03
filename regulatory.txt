@@ -1,0 +1,116 @@
+  if strcmp(algorytm, 'PID')
+        %uchyb
+        e(k) = yzad(k)-y(k);
+        
+        %sygnal sterujacy regulatora PID
+        u(k) = r2*e(k-2) + r1*e(k-1) + r0*e(k) + u(k-1);
+    end
+    
+    if strcmp(algorytm, 'NPL') || strcmp(algorytm, 'GPC') || strcmp(algorytm, 'NO')
+        %%%---wyjscie modelu---%%%
+        if strcmp(algorytm, 'NPL') || strcmp(algorytm, 'NO')
+            wesn_arx = [u(k-3) u(k-4) y(k-1) y(k-2)]';
+            ymod(k)  = w20+w2*tanh(w10+w1*wesn_arx);
+        elseif strcmp(algorytm, 'GPC')
+            ymod(k)  = b(4)*u(k-3) + b(5)*u(k-4) + a(1)*y(k-1) + a(2)*y(k-2);
+        end
+        
+        %%%---pomiar zaklocenia---%%%
+        d=y(k)-ymod(k);
+        
+        if strcmp(algorytm, 'NO')
+            u0 = u(k-1)*ones(1,Nu);
+            opcje = optimset('Algorithm','sqp', 'Display', 'off', 'TolFun',1e-10,'TolX',1e-10);
+            uopt = fmincon(@fun, u0, [],[],[],[], umin_opt, umax_opt, [], opcje);
+            drawnow;
+            u(k)=uopt(1);
+        elseif strcmp(algorytm, 'NPL')
+            %%%---trajektoria swobodna---%%%
+            wesn = [u(k-2) u(k-3) y(k) y(k-1)]';
+            y_zero(1) = w20+w2*tanh(w10+w1*wesn) + d;
+            wesn = [u(k-1) u(k-2) y_zero(1) y(k)]';
+            y_zero(2) = w20+w2*tanh(w10+w1*wesn) + d;
+            for i=3:N
+                wesn = [u(k-1) u(k-1) y_zero(i-1) y_zero(i-2)]';
+                y_zero(i) = w20+w2*tanh(w10+w1*wesn) + d;
+            end
+            
+            %%%---linearyzacja modelu---%%%
+            y_pp = ymod(k);
+            
+            %wspolczynnik b4
+            wesn = [u(k-3)+delta u(k-4) y(k-1) y(k-2)]';
+            y_d = w20+w2*tanh(w10+w1*wesn);
+            b3 = (y_d-y_pp)/delta;
+            
+            %wspolczynnik b5
+            wesn = [u(k-3) u(k-4)+delta y(k-1) y(k-2)]';
+            y_d = w20+w2*tanh(w10+w1*wesn);
+            b4  = (y_d-y_pp)/delta;
+            
+            %wspolczynnik a1
+            wesn = [u(k-3) u(k-4) y(k-1)+delta y(k-2)]';
+            y_d = w20+w2*tanh(w10+w1*wesn);
+            a1  = -(y_d-y_pp)/delta;
+            
+            %wspolczynnik a2
+            wesn = [u(k-3) u(k-4) y(k-1) y(k-2)+delta]';
+            y_d = w20+w2*tanh(w10+w1*wesn);
+            a2  = -(y_d-y_pp)/delta;
+            
+            %model zlinearyzwoany
+            ymod_lin(k) = b3*u(k-3) + b4*u(k-4) - a1*y(k-1) - a2*y(k-2);
+            
+            %%%---odpowiedz skokowa---%%%
+            
+            a = [a1 a2];
+            b = [0 0 b3 b4];
+            for j=1:N
+                %suma b
+                suma_b = 0;
+                i_max  = min([j, nb]);
+                for i=1:i_max
+                    suma_b = b(i) + suma_b;
+                end
+                
+                %suma a
+                suma_a = 0;
+                i_max  = min([j-1, na]);
+                for i=1:i_max
+                    suma_a = a(i)*s(j-i) + suma_a; %tu mo�e byc blad
+                end
+                s(j) = suma_b - suma_a;
+            end
+            
+            %%%---macierz dynamiczna---%%%
+            M=zeros(N, Nu);
+            i=0;
+            for j=1:Nu  %wypelnianie macierzy trojkatnej dolnej M
+                M(j:N,j)=s(1:N-i)';
+                i=i+1;
+            end
+            K=inv(M.'*M+lambda*I)*M';
+        elseif strcmp(algorytm, 'GPC')
+            %%%-----------GPC------------%%%
+            %%%---trajektoria swobodna---%%%
+            y_zero(1) = b(4)*u(k-3) + b(5)*u(k-4) + a(1)*y(k) + a(2)*y(k-1) + d;
+            y_zero(2) = b(4)*u(k-2) + b(5)*u(k-3) + a(1)*y_zero(1) + a(2)*y(k) + d;
+            y_zero(3) = b(4)*u(k-1) + b(5)*u(k-2) + a(1)*y_zero(2) + a(2)*y_zero(1) + d;
+            for i=4:N
+                y_zero(i) = b(4)*u(k-1) + b(5)*u(k-2) + a(1)*y_zero(i-1) + a(2)*y_zero(i-2) + d;
+            end
+        end
+        %%%---obliczenie sterowania---%%%
+        deltaU=K*(Yzad(:,k)-y_zero);
+        delta_u=deltaU(1);
+        u(k)=u(k-1)+delta_u;
+    end
+    
+    %ograniczenie sygna�u steruj�cego
+    if not(strcmp(algorytm, 'NO'))
+        if u(k)>u_max
+            u(k)=u_max;
+        elseif u(k)<u_min
+            u(k)=u_min;
+        end
+    end
