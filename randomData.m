@@ -1,7 +1,8 @@
 %Dane uczace
-rand("seed", 21);
+% rand("seed", 21);
 %Dane weryfikujące
-% rand("seed", 37);
+rand("seed", 37);
+%weryfikujace skok co 50, uczace co 100
 alpha1=-1.422574;
 alpha2=0.466776;
 beta1=0.017421;
@@ -13,7 +14,7 @@ x2 = zeros(1,4);
 y = zeros(1,4);
 u(1) = 0;
 for i=2:2000
-    if(mod(i,100) == 0)
+    if(mod(i,50) == 0)
         u(i) = -1 + 2*rand(1,1);
     else
         u(i) = u(i-1);
@@ -28,7 +29,7 @@ end
 
 plot(u)
 title("Dane weryfikujace");
-exportgraphics(gca, "dane_weryfikujace.pdf")
+% exportgraphics(gca, "dane_weryfikujace.pdf")
 figure
 plot(y)
 title("Dane weryfikujace");
