@@ -11,15 +11,15 @@ close all;
 % w10(9,1)=4.5965872106e-001; w1(9,1)=-6.3820960981e-001; w1(9,2)=-4.3976008211e-001; w1(9,3)=-2.4726624260e-001; w1(9,4)=-3.5147521298e-001; 
 % w10(10,1)=1.4621967641e-001; w1(10,1)=1.5471799321e-003; w1(10,2)=3.0711606136e-003; w1(10,3)=3.1480804312e-001; w1(10,4)=-7.1794468618e-002; 
 % w20=-7.7757547110e-002; w2(1)=1.6447536959e-001; w2(2)=6.4282820226e-001; w2(3)=-3.5945510289e-001; w2(4)=-8.6205069640e-001; w2(5)=1.1911357875e-001; w2(6)=8.6492689904e-001; w2(7)=-6.7941582573e-001; w2(8)=-7.1168975761e-002; w2(9)=1.0891019985e-001; w2(10)=1.2118790291e+000; 
+model_10_1
 
-
-nazwa = "toolbox_na_oe"
-values = load("model_toolbox_levenberg.mat");
-w20 = values.b(end);
-w10 = values.b(1:end-1);
-
-w2 = values.LW;
-w1 = values.IW;
+nazwa = "test"
+% values = load("model_toolbox_levenberg.mat");
+% w20 = values.b(end);
+% w10 = values.b(1:end-1);
+% 
+% w2 = values.LW;
+% w1 = values.IW;
 
 values = load('dane_wer.mat');
 y_wer = values.y;
@@ -30,7 +30,7 @@ x_ucz = values.u;
 y = zeros(1, length(y_wer));
 
 arx = 0;
-oe = 0;
+oe = 1;
 if oe
 for k = 5:length(y_wer)
     x = [x_wer(k-3);x_wer(k-4);y(k-1);y(k-2)];
