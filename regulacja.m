@@ -8,7 +8,7 @@ S = max(na,nb) + 1;
 model_10_1
 g1 = @(u)((exp(4.125*u)-1)/(exp(4.125*u)+1));
 g2 = @(x) (1 - exp(-1.2*x));
-reg = 3; % 0 - NPL, 1 - GPC, 2 - PID, 3 - NO
+reg = 0; % 0 - NPL, 1 - GPC, 2 - PID, 3 - NO
 
 % predykcja
 N = 15;

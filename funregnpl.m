@@ -1,5 +1,5 @@
 function [] = funregnpl()
-global N Nu lambda w1 w10 w2 w20 yz y u du ddmc k delta na nb tau;
+global N Nu lambda w1 w10 w2 w20 yz y u du ddmc k delta na nb tau K;
     a = zeros(na,1);
     b = zeros(nb,1);
     ymod = siec_wyjscie([u(k-tau) u(k-tau-1) y(k-1) y(k-2)]');
