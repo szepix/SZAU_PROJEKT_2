@@ -8,12 +8,13 @@ S = max(na,nb) + 1;
 model_10_1
 g1 = @(u)((exp(4.125*u)-1)/(exp(4.125*u)+1));
 g2 = @(x) (1 - exp(-1.2*x));
-reg = 0; % 0 - NPL, 1 - GPC, 2 - PID, 3 - NO
+reg = 3; % 0 - NPL, 1 - GPC, 2 - PID, 3 - NO
 
 % predykcja
-N = 15;
-Nu = 15;
+N = 13;
+Nu = 2;
 lambda = 2;
+sa = false
 
 % NPL
 if reg == 0
@@ -48,10 +49,10 @@ end
 
 % PID
 if reg == 2
-    Tu = 13;
-    Kp = 4*0.6;
-    Ti = Tu/2;
-    Td = Tu/8;
+    Tu = 14;
+    Kp = 5.5 * 0.6;
+    Ti = Tu * 0.5;
+    Td = Tu * 0.12;
     T = 1;
     r0 = Kp*(1+T/2/Ti+Td/T);
     r1 = Kp*(T/2/Ti - 2*Td/T - 1);
@@ -123,7 +124,7 @@ for k=n0:n
     
 end
 E = (yz-y(1:n))'*(yz-y(1:n));
-% figure
+f = figure
 subplot(2,1,1)
 plot(u(1:n))
 hold on
@@ -137,3 +138,15 @@ hold on
 plot(yz)
 title('E ='+string(E));
 legend('y','yzad')
+if sa
+    if reg == 0
+        exportgraphics(f, "NPL_N_" + N + "N_u_" + Nu + "lambda_" + lambda + ".pdf")
+    elseif reg == 1
+        exportgraphics(f, "GPC_N_" + N + "N_u_" + Nu + "lambda_" + lambda + ".pdf")
+    elseif reg == 2
+         exportgraphics(f, "PID_K_" + Kp + "_Ti_" + Ti + "_Td_" + Td + ".pdf")
+    elseif reg == 3
+        exportgraphics(f, "NO_N_" + N + "N_u_" + Nu + "lambda_" + lambda + ".pdf")
+    end
+
+end
